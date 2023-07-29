@@ -1,0 +1,2 @@
+cargo:rustc-env=TYPENUM_BUILD_CONSTS=/Users/mac/Desktop/vrf/target/debug/build/typenum-cf5ca8ae7bb3b4a3/out/consts.rs
+cargo:rustc-env=TYPENUM_BUILD_OP=/Users/mac/Desktop/vrf/target/debug/build/typenum-cf5ca8ae7bb3b4a3/out/op.rs
