@@ -26,6 +26,13 @@ pub struct ECVRFContractProof {
     pub inverse_z: Field,
 }
 
+#[derive(Clone, Debug)]
+pub struct Proof {
+    pub gamma: (String, String),
+    pub c: String,
+    pub s: String,
+}
+
 impl ECVRFProof {
     pub fn new(gamma: Affine, c: Scalar, s: Scalar, y: Scalar, pk: PublicKey) -> Self {
         Self { gamma, c, s, y, pk }

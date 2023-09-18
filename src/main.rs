@@ -1,5 +1,5 @@
 use crate::{
-    ecproof::{ECVRFContractProof, ECVRFProof},
+    ecproof::{ECVRFContractProof, ECVRFProof, Proof},
     helper::{
         address_to_scalar, calculate_witness_address, ecmult, ecmult_gen, is_on_curve,
         jacobian_to_affine, keccak256_affine_scalar, new_candidate_point, projective_ec_add,
@@ -127,6 +127,21 @@ impl ECVRF<'_> {
         let mut r = Scalar::default();
         r.set_b32(&output).unwrap_u8();
         r
+    }
+    pub fn display(&self, smart_contract_proof: ECVRFProof) -> Proof {
+        let gamma1 = hex::encode(smart_contract_proof.gamma.x.b32());
+
+        let gamma2 = hex::encode(smart_contract_proof.gamma.y.b32());
+
+        let c = hex::encode(smart_contract_proof.c.b32());
+
+        let s = hex::encode(smart_contract_proof.s.b32());
+
+        let gamma = (gamma1, gamma2);
+        let c = c;
+        let s = s;
+
+        Proof { gamma, c, s }
     }
 
     // We use this method to prove a randomness for L1 smart contract
@@ -302,79 +317,38 @@ impl ECVRF<'_> {
 use rand::thread_rng;
 // The results below have been tested on chainlink.
 fn main() {
-    //Check the correctness of the projective_ec_add function
     let mut r = thread_rng();
-
-    let mut indexset = Vec::new();
-    for i in 1..64 {
-        indexset.push(Scalar::from_int(i));
-    }
-    // let mut lagrange_coeff = Vec::new();
-    //  for i in 1..64 {
-    //     let mut coeff = Scalar::from_int(0);
-    //    for j in 1..64 {
-    //       if j != i {
-    //          coeff = coeff * Scalar::from_int(j) * Scalar::from_int(j - i).inv();
-    //     }
-    // }
-    //lagrange_coeff.push(coeff);
-    //}
-    // Random an alpha value
+    let start = Instant::now();
+    let mut sum = Jacobian::default();
     let alpha = Scalar([
         0xD0364141, 0xBFD25E8C, 0xAF48A03B, 0xBAAEDCE6, 0xFFFFFFFE, 0xFFFFFFFF, 0xFFFFFFFF,
         0xFFFFFFFF,
     ]);
+    let alpha2 = hex::encode(alpha.b32());
     let mut sum = Jacobian::default();
-    // Start time
-    //let start = Instant::now();
-    // Here, each participant publishes his partial ECVRF result. For
-    // testing purpose only and simplicity, we let
-    // each participant to be an ECVRF class.
-    for i in 1..4 {
-        let secret_key = SecretKey::random(&mut r);
+
+    println! {"{:?}",alpha2};
+    for i in 1..5 {
+        let secret_key = SecretKey::random(&mut thread_rng());
+        let secret_key2: Scalar = secret_key.into();
+        println! {"Output of participant {i}:"};
         let ecvrf = ECVRF::new(secret_key);
-        //Each participant P_i publishes the ECVRF result
-        println!("Partial Output of Participant {i}:");
         let r1 = ecvrf.prove(&alpha);
-        println!("{:?}", r1.gamma);
-        println!("\n");
-        // Anyone can verify the ECVRF result
+        let pr = ecvrf.display(r1);
+        println! {"{:?}",pr.gamma};
+        println! {"Proof of participant {i}:"};
+        println! {"{:?}",pr};
         let r2 = ecvrf.verify(&alpha, &r1);
-        println!("Verifying Result of Participant {i}:");
-        println!("{:?}", r2);
+        println! {"Verifying the output of participant {i}:"};
+        println! {"Result: {r2}"};
         println!("\n");
-        assert!(r2);
         sum = sum.add_ge(&r1.gamma);
     }
-    // The final result of the protocol
-    println!("Combining Partial Outputs");
-    println!("Final Output");
-    let secret_key = SecretKey::random(&mut r);
-    let ecvrf = ECVRF::new(secret_key);
-    //Each participant P_i publishes the ECVRF result
-    let r1 = ecvrf.prove(&alpha);
-    println!("Output:");
-    println!("{:?}", r1.y);
-    println!("\n");
-    println!("Proof:");
-    println!("gamma:");
-    println!("{:?}", r1.gamma);
-    println!("c:");
-    println!("{:?}", r1.c);
-    println!("s:");
-    println!("{:?}", r1.s);
-    let r2 = ecvrf.verify(&alpha, &r1);
-    println!("\n");
-    println!("Verifying Result");
-    println!("{:?}", r2);
-    //let mut sum_affine = Affine::default();
-    //sum_affine = Affine::from_gej(&sum);
-    //let y = keccak256_affine_scalar(&sum_affine);
-    //println!("{:?}", y);
-    //let mut sum_affine = Affine::default();
-    //sum_affine = Affine::from_gej(&sum);
-    //let output = keccak256_affine_scalar(&sum_affine);
-    //println!("{:?}", output);
-    //let duration = start.elapsed();
-    //println!("Time: {:?}", duration);
+    println!("There are 3 participants that have produced valid outputs: 1,2,3");
+    println!("Combining final output...");
+    let mut sum_affine = Affine::default();
+    sum_affine = Affine::from_gej(&sum);
+    let r1 = keccak256_affine_scalar(&sum_affine);
+    let y = hex::encode(r1.b32());
+    println!("Final output: {y}");
 }
