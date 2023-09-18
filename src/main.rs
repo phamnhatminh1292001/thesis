@@ -348,6 +348,8 @@ fn main() {
     println!("Combining final output...");
     let mut sum_affine = Affine::default();
     sum_affine = Affine::from_gej(&sum);
+    sum_affine.x.normalize();
+    sum_affine.y.normalize();
     let r1 = keccak256_affine_scalar(&sum_affine);
     let y = hex::encode(r1.b32());
     println!("Final output: {y}");
