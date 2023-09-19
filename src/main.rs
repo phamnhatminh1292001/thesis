@@ -326,8 +326,9 @@ fn main() {
     ]);
     let alpha2 = hex::encode(alpha.b32());
     let mut sum = Jacobian::default();
-
+    println! {"Input of the current epoch :"};
     println! {"{:?}",alpha2};
+    println!("\n");
     for i in 1..5 {
         let secret_key = SecretKey::random(&mut thread_rng());
         let secret_key2: Scalar = secret_key.into();
