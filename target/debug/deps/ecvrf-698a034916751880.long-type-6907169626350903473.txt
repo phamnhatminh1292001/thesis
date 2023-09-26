@@ -1,0 +1,1 @@
+verifier_contract::VerifierContract<SignerMiddleware<std::result::Result<ethers::ethers_providers::Provider<Http>, url::parser::ParseError>, Wallet<ethers::ethers_core::k256::ecdsa::SigningKey>>>

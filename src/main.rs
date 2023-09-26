@@ -6,11 +6,13 @@ use crate::{
         randomize, scalar_is_gte, GROUP_ORDER,
     },
 };
+use ethers::prelude::*;
 use libsecp256k1::{
     curve::{Affine, ECMultContext, ECMultGenContext, Field, Jacobian, Scalar, AFFINE_G},
     PublicKey, SecretKey, ECMULT_CONTEXT, ECMULT_GEN_CONTEXT,
 };
 use std::time::{Duration, Instant};
+use std::{str::FromStr, sync::Arc};
 use tiny_keccak::{Hasher, Keccak};
 pub mod ecproof;
 pub mod helper;
@@ -21,6 +23,16 @@ pub mod secp256k1 {
 pub mod random {
     pub use rand::thread_rng;
 }
+use ethers::{
+    contract::abigen,
+    core::{
+        types::{Address, U256},
+        utils::Anvil,
+    },
+    middleware::SignerMiddleware,
+    providers::{Http, Provider},
+    signers::LocalWallet,
+};
 
 pub struct ECVRF<'a> {
     secret_key: SecretKey,
@@ -128,21 +140,6 @@ impl ECVRF<'_> {
         r.set_b32(&output).unwrap_u8();
         r
     }
-    pub fn display(&self, smart_contract_proof: ECVRFProof) -> Proof {
-        let gamma1 = hex::encode(smart_contract_proof.gamma.x.b32());
-
-        let gamma2 = hex::encode(smart_contract_proof.gamma.y.b32());
-
-        let c = hex::encode(smart_contract_proof.c.b32());
-
-        let s = hex::encode(smart_contract_proof.s.b32());
-
-        let gamma = (gamma1, gamma2);
-        let c = c;
-        let s = s;
-
-        Proof { gamma, c, s }
-    }
 
     // We use this method to prove a randomness for L1 smart contract
     // This prover was optimized for on-chain verification
@@ -223,6 +220,21 @@ impl ECVRF<'_> {
         }
     }
 
+    pub fn display(&self, smart_contract_proof: ECVRFProof) -> Proof {
+        let gamma1 = hex::encode(smart_contract_proof.gamma.x.b32());
+
+        let gamma2 = hex::encode(smart_contract_proof.gamma.y.b32());
+
+        let c = hex::encode(smart_contract_proof.c.b32());
+
+        let s = hex::encode(smart_contract_proof.s.b32());
+
+        let gamma = (gamma1, gamma2);
+        let c = c;
+        let s = s;
+
+        Proof { gamma, c, s }
+    }
     // Ordinary prover
     pub fn prove(&self, alpha: &Scalar) -> ECVRFProof {
         let mut pub_affine: Affine = self.public_key.into();
@@ -315,8 +327,12 @@ impl ECVRF<'_> {
 }
 
 use rand::thread_rng;
+abigen!(VerifierContract, "src/verifier_abi.json");
+
 // The results below have been tested on chainlink.
-fn main() {
+#[tokio::main]
+
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut r = thread_rng();
     let start = Instant::now();
     let mut sum = Jacobian::default();
@@ -326,9 +342,8 @@ fn main() {
     ]);
     let alpha2 = hex::encode(alpha.b32());
     let mut sum = Jacobian::default();
-    println! {"Input of the current epoch :"};
+
     println! {"{:?}",alpha2};
-    println!("\n");
     for i in 1..5 {
         let secret_key = SecretKey::random(&mut thread_rng());
         let secret_key2: Scalar = secret_key.into();
@@ -354,4 +369,107 @@ fn main() {
     let r1 = keccak256_affine_scalar(&sum_affine);
     let y = hex::encode(r1.b32());
     println!("Final output: {y}");
+
+    let secret_key = SecretKey::random(&mut thread_rng());
+    let ecvrf = ECVRF::new(secret_key);
+
+    //let proof = ecvrf.prove(&alpha);
+    //println!("result: {:#?}", proof);
+
+    // println!("{:?}", ecvrf.verify(&alpha, &proof));
+
+    let smart_contract_proof = ecvrf.prove_contract(&alpha);
+
+    let mut pub_affine: Affine = smart_contract_proof.pk.into();
+    pub_affine.x.normalize();
+    pub_affine.y.normalize();
+
+    let pk1 = U256::from_str_radix(&hex::encode(pub_affine.x.b32()).as_str(), 16)?;
+
+    let pk2 = U256::from_str_radix(hex::encode(pub_affine.y.b32()).as_str(), 16)?;
+
+    let gamma1 =
+        U256::from_str_radix(hex::encode(smart_contract_proof.gamma.x.b32()).as_str(), 16)?;
+
+    let gamma2 =
+        U256::from_str_radix(hex::encode(smart_contract_proof.gamma.y.b32()).as_str(), 16)?;
+
+    let c = U256::from_str_radix(hex::encode(smart_contract_proof.c.b32()).as_str(), 16)?;
+
+    let s = U256::from_str_radix(hex::encode(smart_contract_proof.s.b32()).as_str(), 16)?;
+
+    let y = U256::from_str_radix(hex::encode(smart_contract_proof.y.b32()).as_str(), 16)?;
+
+    let alpha = U256::from_str_radix(hex::encode(smart_contract_proof.alpha.b32()).as_str(), 16)?;
+
+    // Convert the String into an H160
+    let address_bytes: [u8; 20] = {
+        let mut bytes = [0; 20];
+        bytes.copy_from_slice(&smart_contract_proof.witness_address.b32()[12..]);
+        bytes
+    };
+
+    let witness_address: H160 = H160::from(address_bytes);
+
+    let witness_gamma1 = U256::from_str_radix(
+        hex::encode(smart_contract_proof.witness_gamma.x.b32()).as_str(),
+        16,
+    )?;
+
+    let witness_gamma2 = U256::from_str_radix(
+        hex::encode(smart_contract_proof.witness_gamma.y.b32()).as_str(),
+        16,
+    )?;
+
+    let witness_hash1 = U256::from_str_radix(
+        hex::encode(smart_contract_proof.witness_hash.x.b32()).as_str(),
+        16,
+    )?;
+
+    let witness_hash2 = U256::from_str_radix(
+        hex::encode(smart_contract_proof.witness_hash.y.b32()).as_str(),
+        16,
+    )?;
+
+    let inverse_z = U256::from_str_radix(
+        hex::encode(smart_contract_proof.inverse_z.b32()).as_str(),
+        16,
+    )?;
+
+    let pk = [pk1, pk2];
+    let gamma = [gamma1, gamma2];
+    let c = c;
+    let s = s;
+    let seed = alpha;
+    let u_witness = witness_address;
+    let c_gamma_witness = [witness_gamma1, witness_gamma2];
+    let s_hash_witness = [witness_hash1, witness_hash2];
+    let z_inv = inverse_z;
+
+    let provider = Arc::new(Provider::<Http>::try_from(
+        "https://ethereum-sepolia.blockpi.network/v1/rpc/public",
+    )?);
+    //  let client = SignerMiddleware::new(provider);
+    // let client = Arc::new(client);
+
+    let str_addr: &str = "0x83088c4cDbcf3D0018719fE748d7B758bf738860";
+    let addr: Address = str_addr.parse().unwrap();
+    let contract = VerifierContract::new(addr, provider);
+    // NOTE: this is all just dummy data
+    let output = contract
+        .verify_vrf_proof(
+            pk,
+            gamma,
+            c,
+            s,
+            seed,
+            u_witness,
+            c_gamma_witness,
+            s_hash_witness,
+            z_inv,
+        )
+        .call()
+        .await;
+    println!("{:?}", output);
+    Ok(())
 }

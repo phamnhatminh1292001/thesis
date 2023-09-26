@@ -1,0 +1,1 @@
+verifier_contract::VerifierContract<SignerMiddleware<ethers::ethers_providers::Provider<Http>, Wallet<ethers::ethers_core::k256::ecdsa::SigningKey>>>

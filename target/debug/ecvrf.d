@@ -1,1 +1,1 @@
-C:\Users\Admin\Desktop\thesis\target\debug\ecvrf.exe: C:\Users\Admin\Desktop\thesis\src\ecproof.rs C:\Users\Admin\Desktop\thesis\src\helper.rs C:\Users\Admin\Desktop\thesis\src\main.rs
+/Users/mac/Desktop/vrf/target/debug/ecvrf: /Users/mac/Desktop/vrf/src/ecproof.rs /Users/mac/Desktop/vrf/src/helper.rs /Users/mac/Desktop/vrf/src/main.rs

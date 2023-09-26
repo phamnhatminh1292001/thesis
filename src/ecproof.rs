@@ -1,8 +1,8 @@
+use ethers::types::U256;
 use libsecp256k1::{
     curve::{Affine, Field, Scalar},
     PublicKey,
 };
-
 #[derive(Clone, Copy, Debug)]
 pub struct ECVRFProof {
     pub gamma: Affine,
@@ -25,7 +25,6 @@ pub struct ECVRFContractProof {
     pub witness_hash: Affine,
     pub inverse_z: Field,
 }
-
 #[derive(Clone, Debug)]
 pub struct Proof {
     pub gamma: (String, String),
