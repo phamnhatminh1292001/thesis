@@ -333,22 +333,48 @@ abigen!(VerifierContract, "src/verifier_abi.json");
 #[tokio::main]
 
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Testing the system for 4 participants
     let mut r = thread_rng();
     let start = Instant::now();
     let mut sum = Jacobian::default();
+    //The current input
     let alpha = Scalar([
         0xD0364141, 0xBFD25E8C, 0xAF48A03B, 0xBAAEDCE6, 0xFFFFFFFE, 0xFFFFFFFF, 0xFFFFFFFF,
         0xFFFFFFFF,
     ]);
+
     let alpha2 = hex::encode(alpha.b32());
     let mut sum = Jacobian::default();
+    // The list of Lagrange coefficients for 4 participants
+    let mut lag1 = Scalar([
+        0x00000004, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+        0x00000000,
+    ]);
+    let mut lag2 = Scalar([
+        0xd036413b, 0xbfd25e8c, 0xaf48a03b, 0xbaaedce6, 0xfffffffe, 0xffffffff, 0xffffffff,
+        0xffffffff,
+    ]);
 
+    let mut lag3 = Scalar([
+        0xd0364140, 0xbfd25e8c, 0xaf48a03b, 0xbaaedce6, 0xfffffffe, 0xffffffff, 0xffffffff,
+        0xffffffff,
+    ]);
+    let mut lag4 = Scalar([
+        0x00000004, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+        0x00000000,
+    ]);
+    let mut vec = Vec::new();
+    vec.push(lag1);
+    vec.push(lag2);
+    vec.push(lag3);
+    vec.push(lag4);
     println! {"{:?}",alpha2};
     for i in 1..5 {
         let secret_key = SecretKey::random(&mut thread_rng());
         let secret_key2: Scalar = secret_key.into();
         println! {"Output of participant {i}:"};
         let ecvrf = ECVRF::new(secret_key);
+        let context = ecvrf.ctx_mul;
         let r1 = ecvrf.prove(&alpha);
         let pr = ecvrf.display(r1);
         println! {"{:?}",pr.gamma};
@@ -358,10 +384,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         println! {"Verifying the output of participant {i}:"};
         println! {"Result: {r2}"};
         println!("\n");
+        // multiply by lagrange coefficients
+        let temp = ecmult(&context, &r1.gamma, &vec[i - 1]);
         sum = sum.add_ge(&r1.gamma);
     }
     println!("There are 3 participants that have produced valid outputs: 1,2,3");
     println!("Combining final output...");
+
     let mut sum_affine = Affine::default();
     sum_affine = Affine::from_gej(&sum);
     sum_affine.x.normalize();
@@ -372,104 +401,5 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let secret_key = SecretKey::random(&mut thread_rng());
     let ecvrf = ECVRF::new(secret_key);
-
-    //let proof = ecvrf.prove(&alpha);
-    //println!("result: {:#?}", proof);
-
-    // println!("{:?}", ecvrf.verify(&alpha, &proof));
-
-    let smart_contract_proof = ecvrf.prove_contract(&alpha);
-
-    let mut pub_affine: Affine = smart_contract_proof.pk.into();
-    pub_affine.x.normalize();
-    pub_affine.y.normalize();
-
-    let pk1 = U256::from_str_radix(&hex::encode(pub_affine.x.b32()).as_str(), 16)?;
-
-    let pk2 = U256::from_str_radix(hex::encode(pub_affine.y.b32()).as_str(), 16)?;
-
-    let gamma1 =
-        U256::from_str_radix(hex::encode(smart_contract_proof.gamma.x.b32()).as_str(), 16)?;
-
-    let gamma2 =
-        U256::from_str_radix(hex::encode(smart_contract_proof.gamma.y.b32()).as_str(), 16)?;
-
-    let c = U256::from_str_radix(hex::encode(smart_contract_proof.c.b32()).as_str(), 16)?;
-
-    let s = U256::from_str_radix(hex::encode(smart_contract_proof.s.b32()).as_str(), 16)?;
-
-    let y = U256::from_str_radix(hex::encode(smart_contract_proof.y.b32()).as_str(), 16)?;
-
-    let alpha = U256::from_str_radix(hex::encode(smart_contract_proof.alpha.b32()).as_str(), 16)?;
-
-    // Convert the String into an H160
-    let address_bytes: [u8; 20] = {
-        let mut bytes = [0; 20];
-        bytes.copy_from_slice(&smart_contract_proof.witness_address.b32()[12..]);
-        bytes
-    };
-
-    let witness_address: H160 = H160::from(address_bytes);
-
-    let witness_gamma1 = U256::from_str_radix(
-        hex::encode(smart_contract_proof.witness_gamma.x.b32()).as_str(),
-        16,
-    )?;
-
-    let witness_gamma2 = U256::from_str_radix(
-        hex::encode(smart_contract_proof.witness_gamma.y.b32()).as_str(),
-        16,
-    )?;
-
-    let witness_hash1 = U256::from_str_radix(
-        hex::encode(smart_contract_proof.witness_hash.x.b32()).as_str(),
-        16,
-    )?;
-
-    let witness_hash2 = U256::from_str_radix(
-        hex::encode(smart_contract_proof.witness_hash.y.b32()).as_str(),
-        16,
-    )?;
-
-    let inverse_z = U256::from_str_radix(
-        hex::encode(smart_contract_proof.inverse_z.b32()).as_str(),
-        16,
-    )?;
-
-    let pk = [pk1, pk2];
-    let gamma = [gamma1, gamma2];
-    let c = c;
-    let s = s;
-    let seed = alpha;
-    let u_witness = witness_address;
-    let c_gamma_witness = [witness_gamma1, witness_gamma2];
-    let s_hash_witness = [witness_hash1, witness_hash2];
-    let z_inv = inverse_z;
-
-    let provider = Arc::new(Provider::<Http>::try_from(
-        "https://ethereum-sepolia.blockpi.network/v1/rpc/public",
-    )?);
-    //  let client = SignerMiddleware::new(provider);
-    // let client = Arc::new(client);
-
-    let str_addr: &str = "0x83088c4cDbcf3D0018719fE748d7B758bf738860";
-    let addr: Address = str_addr.parse().unwrap();
-    let contract = VerifierContract::new(addr, provider);
-    // NOTE: this is all just dummy data
-    let output = contract
-        .verify_vrf_proof(
-            pk,
-            gamma,
-            c,
-            s,
-            seed,
-            u_witness,
-            c_gamma_witness,
-            s_hash_witness,
-            z_inv,
-        )
-        .call()
-        .await;
-    println!("{:?}", output);
     Ok(())
 }
