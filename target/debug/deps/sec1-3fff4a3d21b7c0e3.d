@@ -1,0 +1,13 @@
+/Users/mac/Desktop/aaa/target/debug/deps/libsec1-3fff4a3d21b7c0e3.rmeta: /Users/mac/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sec1-0.3.0/src/lib.rs /Users/mac/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sec1-0.3.0/src/point.rs /Users/mac/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sec1-0.3.0/src/error.rs /Users/mac/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sec1-0.3.0/src/parameters.rs /Users/mac/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sec1-0.3.0/src/private_key.rs /Users/mac/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sec1-0.3.0/src/traits.rs /Users/mac/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sec1-0.3.0/src/../README.md
+
+/Users/mac/Desktop/aaa/target/debug/deps/libsec1-3fff4a3d21b7c0e3.rlib: /Users/mac/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sec1-0.3.0/src/lib.rs /Users/mac/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sec1-0.3.0/src/point.rs /Users/mac/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sec1-0.3.0/src/error.rs /Users/mac/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sec1-0.3.0/src/parameters.rs /Users/mac/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sec1-0.3.0/src/private_key.rs /Users/mac/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sec1-0.3.0/src/traits.rs /Users/mac/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sec1-0.3.0/src/../README.md
+
+/Users/mac/Desktop/aaa/target/debug/deps/sec1-3fff4a3d21b7c0e3.d: /Users/mac/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sec1-0.3.0/src/lib.rs /Users/mac/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sec1-0.3.0/src/point.rs /Users/mac/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sec1-0.3.0/src/error.rs /Users/mac/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sec1-0.3.0/src/parameters.rs /Users/mac/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sec1-0.3.0/src/private_key.rs /Users/mac/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sec1-0.3.0/src/traits.rs /Users/mac/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sec1-0.3.0/src/../README.md
+
+/Users/mac/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sec1-0.3.0/src/lib.rs:
+/Users/mac/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sec1-0.3.0/src/point.rs:
+/Users/mac/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sec1-0.3.0/src/error.rs:
+/Users/mac/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sec1-0.3.0/src/parameters.rs:
+/Users/mac/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sec1-0.3.0/src/private_key.rs:
+/Users/mac/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sec1-0.3.0/src/traits.rs:
+/Users/mac/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sec1-0.3.0/src/../README.md:
