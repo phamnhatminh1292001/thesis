@@ -1,5 +1,5 @@
 //! helper functions to deal with the elliptic curve operations.
-//! The original source of the gadget module is from here https://github.com/orochi-network/orochimaru/tree/main/libecvrf/src.
+//! The original source of the gadget module is from here https://github.com/orochi-network/orochimaru/blob/main/libecvrf/src/helper.rs.
 use libsecp256k1::{
     curve::{Affine, ECMultContext, ECMultGenContext, Field, Jacobian, Scalar},
     util::{FULL_PUBLIC_KEY_SIZE, SECRET_KEY_SIZE},

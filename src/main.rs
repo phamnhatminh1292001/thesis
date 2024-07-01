@@ -1,6 +1,10 @@
 //! The implementation has two main components: DKG and ECVRF.
-//! I implemented the DKG module by myself.
-//! Most of the original source of ECVRF module is referenced from here https://github.com/orochi-network/orochimaru/tree/main/libecvrf/src.
+//! I implemented the DKG module by myself in dkg_module.
+//! The EVCRF component is implemented in the main file here.
+//! Most of the structs and functions of ECVRF module is referenced from here 
+//! https://github.com/orochi-network/orochimaru/blob/main/libecvrf/src/ecvrf.rs.
+//! The main() function is to test the whole distributed VRF, not the single ECVRF run
+//! like the above link.
 use crate::gadget::{ecmult, ecmult_gen, jacobian_to_affine, keccak256_affine_scalar, randomize};
 use ethers::prelude::*;
 use libsecp256k1::{
@@ -215,7 +219,7 @@ fn main() {
 
     let alpha2 = hex::encode(alpha.b32());
     let mut sum = Jacobian::default();
-    // The list of Lagrange coefficients for 4 participants
+    // The list of Lagrange coefficients for 4 participants. For simplicity, I preprocessed this.
     let mut lag1 = Scalar([
         0x00000004, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
         0x00000000,
