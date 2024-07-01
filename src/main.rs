@@ -1,6 +1,6 @@
 //! The implementation has two main components: DKG and ECVRF.
 //! I implemented the DKG module by myself.
-//! The original source of ECVRF module is from here https://github.com/orochi-network/orochimaru/tree/main/libecvrf/src.
+//! Most of the original source of ECVRF module is referenced from here https://github.com/orochi-network/orochimaru/tree/main/libecvrf/src.
 use crate::gadget::{ecmult, ecmult_gen, jacobian_to_affine, keccak256_affine_scalar, randomize};
 use ethers::prelude::*;
 use libsecp256k1::{
