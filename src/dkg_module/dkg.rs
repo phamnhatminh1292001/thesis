@@ -5,16 +5,13 @@
 // 2) Participant i then calculate s_ij=p_i(j) then sends s_ij to Participant j
 // 3) Participant i then checks thhe validity of
 
-use crate::helper::{ecmult, ecmult_gen, randomize};
+use crate::gadget::{ecmult, ecmult_gen, randomize};
 use libsecp256k1::{
     curve::{Affine, Scalar},
     ECMULT_GEN_CONTEXT,
 };
 use std::collections::{BTreeSet, HashMap};
 use std::time::Duration;
-pub mod message;
-pub mod secret_sharing;
-use crate::message::{InMsg, SecretShare};
 pub mod secp256k1 {
     pub use libsecp256k1::*;
     pub use util::*;
@@ -22,9 +19,8 @@ pub mod secp256k1 {
 pub mod random {
     pub use rand::thread_rng;
 }
-pub mod helper;
-pub mod protocol;
-use crate::protocol::PartyIndex;
+
+use super::{message::{InMsg, SecretShare}, protocol::PartyIndex};
 use thiserror::Error;
 
 #[derive(Debug, Error)]

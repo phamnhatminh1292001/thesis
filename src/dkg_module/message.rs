@@ -1,7 +1,7 @@
 use libsecp256k1::curve::Scalar;
+use protocol::PartyIndex;
 
-use crate::protocol::PartyIndex;
-use crate::secret_sharing::VerifiableSS;
+use super::{protocol, secret_sharing::VerifiableSS};
 pub struct InMsg {
     pub sender: PartyIndex,
     pub fvss: GeneratingPhase,

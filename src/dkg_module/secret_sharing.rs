@@ -3,7 +3,6 @@
 // and commits G*a_0, G*a_1,..., G*a_t
 // Then he compute s_j=a(j) and shares to participant j
 
-use crate::helper::{ecmult, ecmult_gen, randomize, GROUP_ORDER};
 use libsecp256k1::{
     curve::{Affine, ECMultContext, ECMultGenContext, Field, Jacobian, Scalar, AFFINE_G},
     PublicKey, SecretKey, ECMULT_CONTEXT, ECMULT_GEN_CONTEXT,
@@ -25,6 +24,7 @@ pub struct VerifiableSS {
     pub num_share: u32,
     pub commitment: Vec<Affine>,
 }
+use crate::gadget::*;
 
 impl VerifiableSS {
     // This function takes input s and samples a_0,a_1,...,a_t

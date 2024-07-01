@@ -1,4 +1,5 @@
-//! The implementation has two modules: DKG and ECVRF
+//! The implementation has two main components: DKG and ECVRF.
+//! I implemented the DKG module by myself.
 //! The original source of ECVRF module is from here https://github.com/orochi-network/orochimaru/tree/main/libecvrf/src.
 use crate::gadget::{ecmult, ecmult_gen, jacobian_to_affine, keccak256_affine_scalar, randomize};
 use ethers::prelude::*;
@@ -10,11 +11,11 @@ use std::{ops::Neg, time::Instant};
 // use std::{str::FromStr, sync::Arc};
 use tiny_keccak::{Hasher, Keccak};
 pub mod gadget;
+pub mod dkg_module;
 pub mod secp256k1 {
     pub use libsecp256k1::*;
     pub use util::*;
 }
-use dkg_module::*;
 pub mod random {
     pub use rand::thread_rng;
 }
@@ -69,18 +70,11 @@ impl ECVRF<'_> {
         }
     }
 
-    // Hash to curve
-    pub fn encode(&self, alpha: &Scalar, y: Option<&Affine>) -> Affine {
+    pub fn encode(&self, alpha: &Scalar, y: Affine) -> Affine {
         let mut r = Jacobian::default();
         self.ctx_gen.ecmult_gen(&mut r, alpha);
+        r=r.add_ge(&y);
         let mut p = Affine::default();
-        match y {
-            Some(v) => {
-                r = r.add_ge(v);
-                r
-            }
-            None => r,
-        };
         p.set_gej(&r);
         p.x.normalize();
         p.y.normalize();
@@ -111,7 +105,6 @@ impl ECVRF<'_> {
         r
     }
 
-    // Ordinary prover
     pub fn prove(&self, alpha: &Scalar) -> ECVRFProof {
         let mut pub_affine: Affine = self.public_key.into();
         let secret_key: Scalar = self.secret_key.into();
@@ -119,7 +112,7 @@ impl ECVRF<'_> {
         pub_affine.y.normalize();
 
         // Hash to a point on curve
-        let h = self.encode(alpha, Some(&pub_affine));
+        let h = self.encode(alpha, pub_affine);
 
         // gamma = H * secret_key
         let gamma = ecmult(self.ctx_mul, &h, &secret_key);
@@ -167,11 +160,9 @@ impl ECVRF<'_> {
         pub_affine.x.normalize();
         pub_affine.y.normalize();
 
-        assert!(pub_affine.is_valid_var());
-        assert!(vrf_proof.gamma.is_valid_var());
 
         // H = ECVRF_encode(alpha, pk)
-        let h = self.encode(alpha, Some(&pub_affine));
+        let h = self.encode(alpha, pub_affine);
         let mut jh = Jacobian::default();
         jh.set_ge(&h);
 

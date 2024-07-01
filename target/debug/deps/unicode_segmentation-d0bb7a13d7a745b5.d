@@ -1,0 +1,9 @@
+C:\Users\Admin\Desktop\thesis\target\debug\deps\unicode_segmentation-d0bb7a13d7a745b5.rmeta: C:\Users\Admin\.cargo\registry\src\index.crates.io-6f17d22bba15001f\unicode-segmentation-1.10.1\src\lib.rs C:\Users\Admin\.cargo\registry\src\index.crates.io-6f17d22bba15001f\unicode-segmentation-1.10.1\src\grapheme.rs C:\Users\Admin\.cargo\registry\src\index.crates.io-6f17d22bba15001f\unicode-segmentation-1.10.1\src\sentence.rs C:\Users\Admin\.cargo\registry\src\index.crates.io-6f17d22bba15001f\unicode-segmentation-1.10.1\src\word.rs C:\Users\Admin\.cargo\registry\src\index.crates.io-6f17d22bba15001f\unicode-segmentation-1.10.1\src\tables.rs
+
+C:\Users\Admin\Desktop\thesis\target\debug\deps\unicode_segmentation-d0bb7a13d7a745b5.d: C:\Users\Admin\.cargo\registry\src\index.crates.io-6f17d22bba15001f\unicode-segmentation-1.10.1\src\lib.rs C:\Users\Admin\.cargo\registry\src\index.crates.io-6f17d22bba15001f\unicode-segmentation-1.10.1\src\grapheme.rs C:\Users\Admin\.cargo\registry\src\index.crates.io-6f17d22bba15001f\unicode-segmentation-1.10.1\src\sentence.rs C:\Users\Admin\.cargo\registry\src\index.crates.io-6f17d22bba15001f\unicode-segmentation-1.10.1\src\word.rs C:\Users\Admin\.cargo\registry\src\index.crates.io-6f17d22bba15001f\unicode-segmentation-1.10.1\src\tables.rs
+
+C:\Users\Admin\.cargo\registry\src\index.crates.io-6f17d22bba15001f\unicode-segmentation-1.10.1\src\lib.rs:
+C:\Users\Admin\.cargo\registry\src\index.crates.io-6f17d22bba15001f\unicode-segmentation-1.10.1\src\grapheme.rs:
+C:\Users\Admin\.cargo\registry\src\index.crates.io-6f17d22bba15001f\unicode-segmentation-1.10.1\src\sentence.rs:
+C:\Users\Admin\.cargo\registry\src\index.crates.io-6f17d22bba15001f\unicode-segmentation-1.10.1\src\word.rs:
+C:\Users\Admin\.cargo\registry\src\index.crates.io-6f17d22bba15001f\unicode-segmentation-1.10.1\src\tables.rs:
