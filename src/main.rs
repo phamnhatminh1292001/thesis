@@ -241,7 +241,6 @@ fn main() {
     println! {"{:?}",alpha2};
     for i in 1..5 {
         let secret_key = SecretKey::random(&mut thread_rng());
-        let secret_key2: Scalar = secret_key.into();
         println! {"Output of participant {i}:"};
         let ecvrf = ECVRF::new(secret_key);
         let context = ecvrf.ctx_mul;
@@ -256,7 +255,7 @@ fn main() {
         println!("\n");
         // multiply by lagrange coefficients
         let temp = ecmult(&context, &r1.gamma, &vec[i - 1]);
-        sum = sum.add_ge(&r1.gamma);
+        sum = sum.add_ge(&temp);
     }
     println!("There are 3 participants that have produced valid outputs: 1,2,3");
     println!("Combining final output...");
